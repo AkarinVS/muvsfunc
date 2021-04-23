@@ -272,6 +272,15 @@ class _Plugin:
                             recorder.buffer.append(self._get_str(func, args, kwargs, output) + '\n')
 
                     return _VideoNode(output)
+                elif isinstance(output, collections.abc.Sequence) and all([ isinstance(x, vs.VideoNode) for x in output ]):
+                    for out in output:
+                        _ = _repr(out, default_prefix="clip") # register output
+
+                    for recorder in Recorder._live_recorders:
+                        if recorder.is_recording:
+                            recorder.buffer.append(self._get_str(func, args, kwargs, output) + '\n')
+
+                    return type(output)(_VideoNode(item) for item in output)
                 else:
                     return output
 
